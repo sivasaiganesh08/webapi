@@ -1,0 +1,11 @@
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\SampleWebAPI.exe
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\appsettings.Development.json
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\appsettings.json
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\SampleWebAPI.dll
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\SampleWebAPI.deps.json
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\SampleWebAPI.runtimeconfig.json
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\SampleWebAPI.pdb
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\Microsoft.OpenApi.dll
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Ganesh\source\repos\SampleWebAPI\SampleWebAPI\obj\Release\net5.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
