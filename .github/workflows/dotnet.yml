@@ -26,4 +26,19 @@ jobs:
       run: dotnet publish --configuration release -o C:\inetpub\sample-webapi-output
 #    - name: Test
 #      run: dotnet test --no-build --verbosity normal
-#
+
+    - name: Configure IIS Website
+      run: |
+        Import-Module WebAdministration
+        New-WebSite -Name "MyApi" -Port 80 -PhysicalPath "C:\inetpub\wwwroot\MyApi"
+        Set-ItemProperty "IIS:\Sites\MyApi" -Name applicationPool -Value "DefaultAppPool"
+        Start-WebSite "MyApi"
+    
+    - name: Deploy API
+      run: |
+        Import-Module WebAdministration
+        Stop-WebSite "MyApi"
+        Remove-Item "C:\inetpub\wwwroot\MyApi\*" -Recurse
+        Copy-Item -Path "bin\Release\MyApi.dll" -Destination "C:\inetpub\wwwroot\MyApi"
+        Start-WebSite "MyApi"
+
