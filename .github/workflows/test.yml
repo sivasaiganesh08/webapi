@@ -1,0 +1,91 @@
+name: VeracodeAPI
+
+on:
+  push:
+    branches:
+      - Veracode-api
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-policy-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+
+      - name: Zip Project
+        run: |
+        dir /S /B *.py *.html *.htm *.js *.php requirements.txt *.json *.lock *.ts *.pl *.pm *.plx *.pl5 *.cgi *.go *.sum *.mod > files.txt
+        powershell -command "& { Get-Content files.txt | ForEach-Object { Compress-Archive -Path $_ -Update -DestinationPath project.zip } }"
+        del files.txt
+        env:
+          build-name: project.zip
+
+
+      - name: Upload project artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: project-artifact
+          path: project.zip
+
+  download-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: project-artifact
+          path: project.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Run Veracode Upload and Scan
+        uses: veracode/veracode-uploadandscan-action@master
+        with:
+          appname: 'IS-CSS-Internal Web Apps'
+          version: '${{ github.run_id }}'
+          filepath: 'project.zip'
+          vid: '${{ secrets.VERACODE_API_ID }}'
+          vkey: '${{ secrets.VERACODE_API_KEY }}'
+          sandboxname: 'FepGatewayGithubSample'
+          scantimeout: 15
+          criticality: 'VeryHigh'
+          createprofile: false
+
+  synch-issues-to-github:
+    runs-on: ubuntu-latest
+    container:
+      image: veracode/api-signing:latest
+
+    steps:
+      - name: Get SAST Policy flaws
+        run: |
+          cd /tmp
+          export VERACODE_API_KEY_ID="${{ secrets.VERACODE_API_ID }}"
+          export VERACODE_API_KEY_SECRET="${{ secrets.VERACODE_API_KEY }}"
+          guid=$(http --auth-type veracode_hmac GET "https://api.veracode.com/appsec/v1/applications?name=IS-CSS-Internal Web Apps" | jq -r '._embedded.applications[0].guid')
+          echo "GUID: ${guid}"
+
+          # Report on SAST flaws which violate policy
+          total_flaws=$(http --auth-type veracode_hmac GET "https://api.veracode.com/appsec/v2/applications/${guid}/findings?scan_type=STATIC&violates_policy=True" | jq -r '.page.total_elements')
+          echo "TOTAL_FLAWS: ${total_flaws}"
+          http --auth-type veracode_hmac GET "https://api.veracode.com/appsec/v2/applications/${guid}/findings?scan_type=STATIC&violates_policy=True&size=${total_flaws}" > policy_flaws.json
+
+      - name: Synch SAST flaws to GitHub Issues
+        uses: veracode/veracode-flaws-to-issues@v1
+        with:
+          scan-results-json: '/tmp/policy_flaws.json'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
